@@ -4,8 +4,26 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
+
+class Observation:
+    def __init__(self, description, importancy=None, relevance=None, recency=None, timestamp=None, last_access_date=None):
+        self._description = description
+        self._importancy = importancy
+        self._relevance = relevance
+        self._recency = recency
+        self._timestamp = timestamp
+        self._last_access_date = last_access_date
+
+    def __del__(self):
+        pass
+
 # Función para calcular el score de Importancia
-def set_importancy(description):
+@property
+def importancy(self):
+    return self._importancy
+
+@importancy.setter
+def importancy(self):
     """
     Calcula el score de importancia de un evento basado en su descripción textual usando una API de GPT.
     
@@ -30,8 +48,12 @@ def set_importancy(description):
     result = response.json()
     return int(result['choices'][0]['text'].strip())
 
-# Función para calcular el score de Recency
-def set_recency(last_access_date):
+@property
+def recency(self):
+    return self._recency
+
+@recency.setter
+def recency():
     """
     Calcula el score de recency, indicando cuán reciente fue el acceso a un evento.
     
@@ -44,10 +66,14 @@ def set_recency(last_access_date):
     today = datetime.datetime.now()
     recency_days = (today - last_access_date).days
     # Normalización para mantener el score entre 0 y 1
-    return max(0, 1 - (recency_days / 365))  # Supone que después de un año, el evento no tiene relevancia
+    self._recency = max(0, 1 - (recency_days / 365))  # Supone que después de un año, el evento no tiene relevancia
 
-# Función para calcular el score de Relevance
-def set_relevance(documents, query):
+@property
+def relevance(self):
+    return self._relevance
+
+@relevance.setter
+def relevance(documents, query):
     """
     Calcula la relevancia de un conjunto de documentos con respecto a una consulta usando TF-IDF y similitud del coseno.
     
@@ -167,22 +193,12 @@ def run_simulation(events):
             'recency': recency,
             'relevance': relevance.tolist()  # Convertir array a lista para imprimir o almacenar
         }
-        # Ejemplo de uso
-    memory_stream = []
+       
     agent_actions = ['Attending a meeting', 'Writing a report', 'Having lunch with colleagues', 'Receiving a project assignment']
     current_date = datetime.datetime.now()
     query_reference = "work-related activities"
 
     generate_observations(memory_stream, agent_actions, current_date, query_reference)
-
-    # Imprimir las observaciones generadas
-    for observation in memory_stream:
-        print(f"Description: {observation['description']}, Importance: {observation['importance']}, Recency: {observation['recency']}, Relevance: {observation['relevance']}, Timestamp: {observation['timestamp']}")
-
-    # Ejemplo de uso de la función de reflexión
-    reflections_generated = generate_reflections(memory_stream_example)
-    for reflection in reflections_generated:
-        print(reflection)
         
     return results
 
